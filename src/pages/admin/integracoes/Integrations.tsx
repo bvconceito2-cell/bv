@@ -29,14 +29,16 @@ const IntegrationCard = ({
         </div>
       </div>
     </div>
+
     <div className="p-6 flex-1 space-y-4">
       {children}
     </div>
+
     <div className="px-6 py-4 bg-gray-50 border-t border-gray-100 flex justify-end">
       <button 
         onClick={onSave}
         disabled={isSaving}
-        className="bg-[#2D1B4E] text-white px-6 py-2 rounded-lg text-xs font-bold hover:bg-[#1a0f2e] transition-all flex items-center gap-2"
+        className="bg-[#2D1B4E] text-white px-6 py-2 rounded-lg text-xs font-bold hover:bg-[#1a0f2e] transition-all flex items-center gap-2 disabled:opacity-50"
       >
         {isSaving ? <Loader2 className="h-3 w-3 animate-spin" /> : <Save className="h-3 w-3" />}
         SALVAR CONFIGURAÇÕES
@@ -57,7 +59,9 @@ const Integrations = () => {
   const fetchIntegrations = async () => {
     try {
       setLoading(true);
+
       const { data, error } = await supabase.from('integracoes').select('*');
+
       if (error) throw error;
       
       const defaultIntegrations = [
@@ -80,26 +84,39 @@ const Integrations = () => {
     }
   };
 
-
   const getConfig = (chave: string) => {
     const item = integrations.find(i => i.chave === chave);
     return item?.config || {};
   };
 
   const setConfig = (chave: string, newConfig: any) => {
-    setIntegrations(prev => prev.map(i => i.chave === chave ? { ...i, config: { ...i.config, ...newConfig } } : i));
+    setIntegrations(prev =>
+      prev.map(i =>
+        i.chave === chave
+          ? { ...i, config: { ...i.config, ...newConfig } }
+          : i
+      )
+    );
   };
 
   const toggleAtivo = (chave: string) => {
-    setIntegrations(prev => prev.map(i => i.chave === chave ? { ...i, ativo: !i.ativo } : i));
+    setIntegrations(prev =>
+      prev.map(i =>
+        i.chave === chave
+          ? { ...i, ativo: !i.ativo }
+          : i
+      )
+    );
   };
 
   const handleSave = async (chave: string) => {
     const item = integrations.find(i => i.chave === chave);
-    if (!item) return;
+
+    if (!item) return false;
 
     try {
       setIsSaving(chave);
+
       const { error } = await supabase.from('integracoes').upsert({
         chave: item.chave,
         config: item.config,
@@ -107,15 +124,29 @@ const Integrations = () => {
       }, { onConflict: 'chave' });
 
       if (error) throw error;
+
       toast.success(`Configurações de ${chave} salvas!`);
+      return true;
     } catch (error: any) {
       toast.error('Erro ao salvar: ' + error.message);
+      return false;
     } finally {
       setIsSaving(null);
     }
   };
 
-  if (loading) return <div className="flex justify-center p-20"><Loader2 className="animate-spin text-[#2D1B4E]" /></div>;
+  const getSupabaseFunctionsUrl = () => {
+    const envUrl = (import.meta as any).env?.VITE_SUPABASE_URL || '';
+    return envUrl || 'https://lmegfvngqeznpfmnerwa.supabase.co';
+  };
+
+  if (loading) {
+    return (
+      <div className="flex justify-center p-20">
+        <Loader2 className="animate-spin text-[#2D1B4E]" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -127,7 +158,6 @@ const Integrations = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Mercado Pago */}
         <IntegrationCard 
           title="Mercado Pago" 
           icon={CreditCard} 
@@ -137,13 +167,13 @@ const Integrations = () => {
         >
           <div className="space-y-4">
             <div className="flex justify-between items-center bg-gray-50 p-3 rounded-lg border border-gray-100">
-               <span className="text-xs font-bold text-gray-700">INTEGRAÇÃO ATIVA</span>
-               <input 
-                 type="checkbox" 
-                 checked={integrations.find(i => i.chave === 'mercadopago')?.ativo || false} 
-                 onChange={() => toggleAtivo('mercadopago')}
-                 className="w-5 h-5"
-               />
+              <span className="text-xs font-bold text-gray-700">INTEGRAÇÃO ATIVA</span>
+              <input 
+                type="checkbox" 
+                checked={integrations.find(i => i.chave === 'mercadopago')?.ativo || false} 
+                onChange={() => toggleAtivo('mercadopago')}
+                className="w-5 h-5"
+              />
             </div>
             
             <div>
@@ -162,6 +192,7 @@ const Integrations = () => {
               <h4 className="text-xs font-bold text-blue-700 uppercase mb-3 flex items-center gap-2">
                 <ShieldCheck className="h-3 w-3" /> Configurações Sandbox
               </h4>
+
               <div className="space-y-3">
                 <div>
                   <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Public Key Sandbox</label>
@@ -173,6 +204,7 @@ const Integrations = () => {
                     placeholder="TEST-..."
                   />
                 </div>
+
                 <div>
                   <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Access Token Sandbox</label>
                   <input 
@@ -190,6 +222,7 @@ const Integrations = () => {
               <h4 className="text-xs font-bold text-gray-700 uppercase mb-3 flex items-center gap-2">
                 <ShieldCheck className="h-3 w-3" /> Configurações Produção
               </h4>
+
               <div className="space-y-3">
                 <div>
                   <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Public Key Produção</label>
@@ -201,6 +234,7 @@ const Integrations = () => {
                     placeholder="APP_USR-..."
                   />
                 </div>
+
                 <div>
                   <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Access Token Produção</label>
                   <input 
@@ -224,9 +258,11 @@ const Integrations = () => {
                       checked={getConfig('mercadopago').metodos?.includes(metodo) || false}
                       onChange={e => {
                         const current = getConfig('mercadopago').metodos || [];
+
                         const next = e.target.checked 
                           ? [...current, metodo]
                           : current.filter((m: string) => m !== metodo);
+
                         setConfig('mercadopago', { metodos: next });
                       }}
                     />
@@ -240,7 +276,9 @@ const Integrations = () => {
               onClick={async () => {
                 const config = getConfig('mercadopago');
                 const ambiente = config.ambiente || 'sandbox';
-                const token = ambiente === 'sandbox' ? config.accessTokenSandbox : config.accessTokenProducao;
+                const token = ambiente === 'sandbox'
+                  ? config.accessTokenSandbox
+                  : config.accessTokenProducao;
                 
                 if (!token) {
                   toast.error('Informe o Access Token para testar.');
@@ -249,11 +287,13 @@ const Integrations = () => {
 
                 try {
                   toast.loading('Testando conexão...', { id: 'test-mp' });
+
                   const { data, error } = await supabase.functions.invoke('testar-conexao-mercadopago', {
                     body: { accessToken: token, ambiente }
                   });
                   
                   if (error) throw error;
+
                   if (data.success) {
                     toast.success('Conexão Mercado Pago OK!', { id: 'test-mp' });
                   } else {
@@ -273,15 +313,13 @@ const Integrations = () => {
                 <strong>Webhook URL:</strong><br />
                 Copie e cole no painel do Mercado Pago:<br />
                 <code className="bg-white/50 px-1 py-0.5 rounded break-all select-all">
-                  https://{window.location.hostname.split('.')[0]}.supabase.co/functions/v1/webhook-mercadopago
+                  {`${getSupabaseFunctionsUrl()}/functions/v1/webhook-mercadopago`}
                 </code>
               </p>
             </div>
           </div>
         </IntegrationCard>
 
-
-        {/* Melhor Envio */}
         <IntegrationCard 
           title="Melhor Envio" 
           icon={Truck} 
@@ -291,13 +329,13 @@ const Integrations = () => {
         >
           <div className="space-y-4">
             <div className="flex justify-between items-center bg-gray-50 p-3 rounded-lg border border-gray-100">
-               <span className="text-xs font-bold text-gray-700">INTEGRAÇÃO ATIVA</span>
-               <input 
-                 type="checkbox" 
-                 checked={integrations.find(i => i.chave === 'melhorenvio')?.ativo || false} 
-                 onChange={() => toggleAtivo('melhorenvio')}
-                 className="w-5 h-5"
-               />
+              <span className="text-xs font-bold text-gray-700">INTEGRAÇÃO ATIVA</span>
+              <input 
+                type="checkbox" 
+                checked={integrations.find(i => i.chave === 'melhorenvio')?.ativo || false} 
+                onChange={() => toggleAtivo('melhorenvio')}
+                className="w-5 h-5"
+              />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
@@ -311,10 +349,12 @@ const Integrations = () => {
                   <option value="sandbox">Sandbox (Teste)</option>
                   <option value="production">Produção (Real)</option>
                 </select>
+
                 <p className="text-[10px] text-gray-400 mt-1">
                   Se o app foi criado no Sandbox do Melhor Envio, selecione Sandbox. Se foi criado em produção, selecione Produção.
                 </p>
               </div>
+
               <div>
                 <label className="block text-xs font-bold text-gray-500 uppercase mb-2">CEP de Origem</label>
                 <input 
@@ -327,11 +367,11 @@ const Integrations = () => {
               </div>
             </div>
 
-
             <div className="p-4 border border-gray-100 bg-gray-50 rounded-lg space-y-3">
               <h4 className="text-xs font-bold text-gray-700 uppercase flex items-center gap-2">
                 <ShieldCheck className="h-3 w-3" /> Credenciais do App
               </h4>
+
               <div>
                 <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Client ID</label>
                 <input 
@@ -342,6 +382,7 @@ const Integrations = () => {
                   placeholder="ID do seu app no Melhor Envio"
                 />
               </div>
+
               <div>
                 <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Client Secret</label>
                 <input 
@@ -364,27 +405,33 @@ const Integrations = () => {
               </p>
             </div>
 
-            {/* DEBUG TÉCNICO MELHOR ENVIO */}
             <div className="p-4 border border-gray-200 bg-gray-50 rounded-lg space-y-3">
               <h4 className="text-xs font-bold text-gray-700 uppercase flex items-center gap-2">
                 <Smartphone className="h-3 w-3" /> Debug Técnico do Token
               </h4>
+
               <div className="grid grid-cols-2 gap-2">
                 {['access_token', 'refresh_token', 'expires_at', 'client_id', 'client_secret'].map(key => {
                   const val = getConfig('melhorenvio')[key];
                   const exists = !!val;
+
                   return (
                     <div key={key} className="flex flex-col p-2 bg-white border border-gray-100 rounded">
                       <span className="text-[9px] font-bold text-gray-400 uppercase">{key}</span>
                       <div className="flex items-center gap-1">
                         <span className={`w-1.5 h-1.5 rounded-full ${exists ? 'bg-green-500' : 'bg-red-500'}`}></span>
                         <span className={`text-[10px] font-mono ${exists ? 'text-green-700' : 'text-red-700'}`}>
-                          {exists ? (key.includes('token') || key.includes('secret') ? `${String(val).substring(0, 8)}...` : String(val).substring(0, 20)) : 'AUSENTE'}
+                          {exists
+                            ? (key.includes('token') || key.includes('secret')
+                              ? `${String(val).substring(0, 8)}...`
+                              : String(val).substring(0, 20))
+                            : 'AUSENTE'}
                         </span>
                       </div>
                     </div>
                   );
                 })}
+
                 <div className="flex flex-col p-2 bg-white border border-gray-100 rounded">
                   <span className="text-[9px] font-bold text-gray-400 uppercase">Status Conexão</span>
                   <div className="flex items-center gap-1">
@@ -397,20 +444,29 @@ const Integrations = () => {
               </div>
             </div>
 
-
             <div className="flex flex-col gap-2">
               <div className="p-3 bg-gray-50 border border-gray-100 rounded-lg space-y-2">
                 <label className="block text-[10px] font-bold text-gray-400 uppercase">URL OAuth (Debug)</label>
+
                 <div className="flex gap-2">
                   <input 
                     type="text" 
                     readOnly 
                     value={(() => {
                       const config = getConfig('melhorenvio');
+
                       if (!config.client_id) return 'Aguardando Client ID...';
+
                       const isSandbox = config.ambiente === 'sandbox';
-                      const baseUrl = isSandbox ? 'https://sandbox.melhorenvio.com.br' : 'https://melhorenvio.com.br';
-                      const redirectUri = encodeURIComponent(`${window.location.origin}/admin/integracoes/melhor-envio/callback`);
+
+                      const baseUrl = isSandbox
+                        ? 'https://sandbox.melhorenvio.com.br'
+                        : 'https://melhorenvio.com.br';
+
+                      const redirectUri = encodeURIComponent(
+                        `${window.location.origin}/admin/integracoes/melhor-envio/callback`
+                      );
+
                       const scopes = encodeURIComponent([
                         'cart-read',
                         'cart-write',
@@ -439,6 +495,7 @@ const Integrations = () => {
                         'webhooks-read',
                         'webhooks-write'
                       ].join(' '));
+
                       return `${baseUrl}/oauth/authorize?client_id=${config.client_id}&redirect_uri=${redirectUri}&response_type=code&scope=${scopes}&state=${isSandbox ? 'sandbox' : 'production'}`;
                     })()}
                     className="flex-1 bg-white border border-gray-100 rounded px-2 py-1 text-[10px] text-gray-500 overflow-hidden text-ellipsis"
@@ -447,16 +504,29 @@ const Integrations = () => {
               </div>
 
               <button
-                onClick={() => {
+                onClick={async () => {
                   const config = getConfig('melhorenvio');
+
                   if (!config.client_id) {
                     toast.error('Informe o Client ID primeiro.');
                     return;
                   }
+
+                  if (!config.client_secret) {
+                    toast.error('Informe o Client Secret primeiro.');
+                    return;
+                  }
                   
                   const isSandbox = config.ambiente === 'sandbox';
-                  const baseUrl = isSandbox ? 'https://sandbox.melhorenvio.com.br' : 'https://melhorenvio.com.br';
-                  const redirectUri = encodeURIComponent(`${window.location.origin}/admin/integracoes/melhor-envio/callback`);
+
+                  const baseUrl = isSandbox
+                    ? 'https://sandbox.melhorenvio.com.br'
+                    : 'https://melhorenvio.com.br';
+
+                  const redirectUri = encodeURIComponent(
+                    `${window.location.origin}/admin/integracoes/melhor-envio/callback`
+                  );
+
                   const scopes = encodeURIComponent([
                     'cart-read',
                     'cart-write',
@@ -485,12 +555,19 @@ const Integrations = () => {
                     'webhooks-read',
                     'webhooks-write'
                   ].join(' '));
-                  const authUrl = `${baseUrl}/oauth/authorize?client_id=${config.client_id}&redirect_uri=${redirectUri}&response_type=code&scope=${scopes}&state=${isSandbox ? 'sandbox' : 'production'}`;
-                  
-                  // Salvar configurações antes de redirecionar
-                  handleSave('melhorenvio').then(() => {
-                    window.location.href = authUrl;
-                  });
+
+                  const authUrl =
+                    `${baseUrl}/oauth/authorize?client_id=${config.client_id}` +
+                    `&redirect_uri=${redirectUri}` +
+                    `&response_type=code` +
+                    `&scope=${scopes}` +
+                    `&state=${isSandbox ? 'sandbox' : 'production'}`;
+
+                  const saved = await handleSave('melhorenvio');
+
+                  if (!saved) return;
+
+                  window.location.href = authUrl;
                 }}
                 className="w-full py-2 bg-[#2D1B4E] text-white rounded-lg text-xs font-bold hover:bg-[#1a0f2e] transition-all flex items-center justify-center gap-2"
               >
@@ -504,6 +581,7 @@ const Integrations = () => {
                       onClick={async () => {
                         try {
                           const config = getConfig('melhorenvio');
+
                           toast.loading('Validando App...', { id: 'test-me' });
                           
                           const SUPABASE_URL = (import.meta as any).env?.VITE_SUPABASE_URL || '';
@@ -527,8 +605,12 @@ const Integrations = () => {
 
                           const status = response.status;
                           const text = await response.text();
+
                           let parsed = null;
-                          try { parsed = JSON.parse(text); } catch (e) {}
+
+                          try {
+                            parsed = JSON.parse(text);
+                          } catch (e) {}
 
                           (window as any).lastMelhorEnvioStatus = status;
                           (window as any).lastMelhorEnvioRaw = text;
@@ -554,6 +636,7 @@ const Integrations = () => {
                       onClick={async () => {
                         try {
                           toast.loading('Validando Token...', { id: 'test-token' });
+
                           const SUPABASE_URL = (import.meta as any).env?.VITE_SUPABASE_URL || '';
                           const SUPABASE_KEY = (import.meta as any).env?.VITE_SUPABASE_PUBLISHABLE_KEY || '';
 
@@ -569,8 +652,12 @@ const Integrations = () => {
 
                           const status = response.status;
                           const text = await response.text();
+
                           let parsed = null;
-                          try { parsed = JSON.parse(text); } catch (e) {}
+
+                          try {
+                            parsed = JSON.parse(text);
+                          } catch (e) {}
 
                           (window as any).lastMelhorEnvioStatus = status;
                           (window as any).lastMelhorEnvioRaw = text;
@@ -607,6 +694,7 @@ const Integrations = () => {
                     onClick={async () => {
                       try {
                         toast.loading('Testando Function Online...', { id: 'test-ping' });
+
                         const SUPABASE_URL = (import.meta as any).env?.VITE_SUPABASE_URL || '';
                         const SUPABASE_KEY = (import.meta as any).env?.VITE_SUPABASE_PUBLISHABLE_KEY || '';
                         
@@ -622,8 +710,12 @@ const Integrations = () => {
 
                         const status = response.status;
                         const text = await response.text();
+
                         let parsed = null;
-                        try { parsed = JSON.parse(text); } catch (e) {}
+
+                        try {
+                          parsed = JSON.parse(text);
+                        } catch (e) {}
 
                         (window as any).lastMelhorEnvioStatus = status;
                         (window as any).lastMelhorEnvioRaw = text;
@@ -648,9 +740,12 @@ const Integrations = () => {
                       setConfig('melhorenvio', { 
                         access_token: null, 
                         refresh_token: null, 
-                        expires_at: null 
+                        expires_at: null,
+                        connected: false
                       });
+
                       handleSave('melhorenvio');
+
                       toast.info('Melhor Envio desconectado.');
                     }}
                     className="py-2 border border-red-100 rounded-lg text-[10px] font-bold text-red-600 hover:bg-red-50 flex items-center justify-center gap-2"
@@ -659,7 +754,6 @@ const Integrations = () => {
                   </button>
                 </div>
 
-                {/* Painel de Debug Técnico Profissional */}
                 <div id="me-debug-panel" className="hidden mt-4 p-4 bg-gray-900 rounded-lg border border-gray-800 shadow-2xl overflow-hidden">
                   <div className="flex justify-between items-center mb-3 border-b border-gray-800 pb-2">
                     <span className="text-[10px] font-bold text-red-400 uppercase tracking-widest">Última Resposta Técnica</span>
@@ -677,6 +771,7 @@ const Integrations = () => {
                         <span className="text-gray-500 block uppercase font-bold">Status HTTP Real</span>
                         <span className="text-white font-mono">{(window as any).lastMelhorEnvioStatus || '---'}</span>
                       </div>
+
                       <div>
                         <span className="text-gray-500 block uppercase font-bold">Etapa (se JSON)</span>
                         <span className="text-white">{(window as any).lastMelhorEnvioError?.etapa || '---'}</span>
@@ -712,8 +807,6 @@ const Integrations = () => {
           </div>
         </IntegrationCard>
 
-
-        {/* E-mail (Resend/SMTP) */}
         <IntegrationCard 
           title="E-mail Transacional" 
           icon={Mail} 
@@ -722,15 +815,16 @@ const Integrations = () => {
           onSave={() => handleSave('email')}
         >
           <div className="space-y-4">
-             <div className="flex justify-between items-center bg-gray-50 p-3 rounded-lg border border-gray-100">
-               <span className="text-xs font-bold text-gray-700">INTEGRAÇÃO ATIVA</span>
-               <input 
-                 type="checkbox" 
-                 checked={integrations.find(i => i.chave === 'email')?.ativo || false} 
-                 onChange={() => toggleAtivo('email')}
-                 className="w-5 h-5"
-               />
+            <div className="flex justify-between items-center bg-gray-50 p-3 rounded-lg border border-gray-100">
+              <span className="text-xs font-bold text-gray-700">INTEGRAÇÃO ATIVA</span>
+              <input 
+                type="checkbox" 
+                checked={integrations.find(i => i.chave === 'email')?.ativo || false} 
+                onChange={() => toggleAtivo('email')}
+                className="w-5 h-5"
+              />
             </div>
+
             <div>
               <label className="block text-xs font-bold text-gray-500 uppercase mb-2">Provedor</label>
               <select 
@@ -742,6 +836,7 @@ const Integrations = () => {
                 <option value="smtp">SMTP Personalizado</option>
               </select>
             </div>
+
             <div>
               <label className="block text-xs font-bold text-gray-500 uppercase mb-2">API Key / Senha</label>
               <input 
@@ -751,6 +846,7 @@ const Integrations = () => {
                 className="w-full bg-gray-50 border border-gray-100 rounded-lg px-4 py-2 text-sm" 
               />
             </div>
+
             <div>
               <label className="block text-xs font-bold text-gray-500 uppercase mb-2">E-mail do Remetente</label>
               <input 
@@ -763,7 +859,6 @@ const Integrations = () => {
           </div>
         </IntegrationCard>
 
-        {/* WhatsApp */}
         <IntegrationCard 
           title="WhatsApp (Z-API / Evolution)" 
           icon={Smartphone} 
@@ -772,15 +867,16 @@ const Integrations = () => {
           onSave={() => handleSave('whatsapp')}
         >
           <div className="space-y-4">
-             <div className="flex justify-between items-center bg-gray-50 p-3 rounded-lg border border-gray-100">
-               <span className="text-xs font-bold text-gray-700">INTEGRAÇÃO ATIVA</span>
-               <input 
-                 type="checkbox" 
-                 checked={integrations.find(i => i.chave === 'whatsapp')?.ativo || false} 
-                 onChange={() => toggleAtivo('whatsapp')}
-                 className="w-5 h-5"
-               />
+            <div className="flex justify-between items-center bg-gray-50 p-3 rounded-lg border border-gray-100">
+              <span className="text-xs font-bold text-gray-700">INTEGRAÇÃO ATIVA</span>
+              <input 
+                type="checkbox" 
+                checked={integrations.find(i => i.chave === 'whatsapp')?.ativo || false} 
+                onChange={() => toggleAtivo('whatsapp')}
+                className="w-5 h-5"
+              />
             </div>
+
             <div>
               <label className="block text-xs font-bold text-gray-500 uppercase mb-2">API URL</label>
               <input 
@@ -791,6 +887,7 @@ const Integrations = () => {
                 placeholder="https://api.z-api.io/..."
               />
             </div>
+
             <div>
               <label className="block text-xs font-bold text-gray-500 uppercase mb-2">Instância / Token</label>
               <input 
