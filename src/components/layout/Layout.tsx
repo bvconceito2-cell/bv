@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useStore } from '../../store/useStore';
 import { Search, ShoppingBag, User, Heart, Menu, X, ChevronRight, Phone } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
@@ -9,26 +9,26 @@ import { cn } from '../../lib/utils';
 
 const Instagram = ({ className }: { className?: string }) => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-    <rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/>
+    <rect width="20" height="20" x="2" y="2" rx="5" ry="5" /><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" /><line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
   </svg>
 );
 
 const Facebook = ({ className }: { className?: string }) => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-    <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
+    <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
   </svg>
 );
 
 const TopBar = () => {
   const { homeSections }: any = useStore();
   const section = homeSections?.find((s: any) => s.chave === 'top_bar');
-  
+
   if (section && !section.visivel) return null;
 
   return (
-    <div 
+    <div
       className="h-9 flex items-center justify-center text-[11px] md:text-[13px] font-semibold tracking-wide px-4 text-center"
-      style={{ 
+      style={{
         backgroundColor: section?.config?.cor_fundo || 'var(--store-primary)',
         color: section?.config?.cor_texto || 'var(--store-button-text)'
       }}
@@ -46,6 +46,7 @@ const Header = ({ onMenuClick }: { onMenuClick: () => void }) => {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
+
     if (searchTerm.trim()) {
       setTimeout(() => {
         navigate(`/category/search?q=${encodeURIComponent(searchTerm)}`);
@@ -64,7 +65,7 @@ const Header = ({ onMenuClick }: { onMenuClick: () => void }) => {
   return (
     <header className="sticky top-0 z-50 w-full bg-white shadow-sm border-b border-gray-200 min-h-[60px]">
       <div className="max-w-[1400px] mx-auto px-4 lg:px-8 py-3 lg:py-5 flex items-center justify-between gap-4">
-        <button 
+        <button
           onClick={onMenuClick}
           className="lg:hidden text-black p-2 -ml-2 hover:bg-gray-100 rounded-full transition-colors"
           aria-label="Abrir menu"
@@ -72,10 +73,10 @@ const Header = ({ onMenuClick }: { onMenuClick: () => void }) => {
           <Menu className="h-6 w-6" />
         </button>
 
-        <Link 
-          to="/" 
+        <Link
+          to="/"
           className="text-black flex flex-col items-start group transition-all duration-300 shrink-0"
-          style={{ 
+          style={{
             fontFamily: 'var(--store-font-primary)',
             fontWeight: 'var(--store-font-weight-menu)',
             letterSpacing: 'var(--store-header-spacing)',
@@ -83,9 +84,9 @@ const Header = ({ onMenuClick }: { onMenuClick: () => void }) => {
           }}
         >
           {appearance?.logo_url ? (
-            <img 
-              src={appearance.logo_url} 
-              alt={config?.nome_loja || "Logo"} 
+            <img
+              src={appearance.logo_url}
+              alt={config?.nome_loja || 'Logo'}
               style={{
                 width: appearance?.config_logo?.desktop ? `${appearance.config_logo.desktop}px` : 'auto',
                 maxWidth: '100%',
@@ -94,21 +95,12 @@ const Header = ({ onMenuClick }: { onMenuClick: () => void }) => {
               }}
               className="w-auto h-auto max-h-[120px] transition-all duration-300 hidden lg:block"
             />
-          ) : (
-            <div className="flex flex-col items-center lg:items-start hidden lg:flex">
-              <span className="text-lg md:text-xl lg:text-2xl leading-tight" style={{ fontFamily: 'inherit', fontWeight: 'var(--store-font-weight-title)', letterSpacing: 'var(--store-header-spacing)', textTransform: 'var(--store-header-transform)' as any }}>
-                {config?.nome_loja?.toUpperCase() || "LOJA"}
-              </span>
-              <span className="text-[7px] lg:text-[9px] opacity-70 -mt-0.5" style={{ fontFamily: 'inherit', fontWeight: 'var(--store-font-weight-title)', letterSpacing: 'var(--store-header-spacing)', textTransform: 'var(--store-header-transform)' as any }}>
-                {config?.tagline?.toUpperCase() || "SUA LOJA"}
-              </span>
-            </div>
-          )}
+          ) : null}
 
           {appearance?.logo_url ? (
-            <img 
-              src={appearance.logo_url} 
-              alt={config?.nome_loja || "Logo"} 
+            <img
+              src={appearance.logo_url}
+              alt={config?.nome_loja || 'Logo'}
               style={{
                 width: appearance?.config_logo?.mobile ? `${appearance.config_logo.mobile}px` : 'auto',
                 maxWidth: '100%',
@@ -117,22 +109,13 @@ const Header = ({ onMenuClick }: { onMenuClick: () => void }) => {
               }}
               className="w-auto h-auto max-h-[80px] transition-all duration-300 lg:hidden"
             />
-          ) : (
-            <div className="flex flex-col items-center lg:items-start lg:hidden">
-              <span className="text-lg leading-tight" style={{ fontFamily: 'inherit', fontWeight: 'var(--store-font-weight-title)', letterSpacing: 'var(--store-header-spacing)', textTransform: 'var(--store-header-transform)' as any }}>
-                {config?.nome_loja?.toUpperCase() || "LOJA"}
-              </span>
-              <span className="text-[7px] opacity-70 -mt-0.5" style={{ fontFamily: 'inherit', fontWeight: 'var(--store-font-weight-title)', letterSpacing: 'var(--store-header-spacing)', textTransform: 'var(--store-header-transform)' as any }}>
-                {config?.tagline?.toUpperCase() || "SUA LOJA"}
-              </span>
-            </div>
-          )}
+          ) : null}
         </Link>
 
         <div className="flex-1 max-w-[500px] hidden lg:block mx-8">
           <form onSubmit={handleSearch} className="search-wrapper">
-            <input 
-              type="text" 
+            <input
+              type="text"
               placeholder="O que você está procurando?"
               className="search-input"
               value={searchTerm}
@@ -145,10 +128,11 @@ const Header = ({ onMenuClick }: { onMenuClick: () => void }) => {
         </div>
 
         <div className="flex items-center gap-2 md:gap-4 lg:gap-8 text-black shrink-0">
-          <Link to={user ? "/minha-conta" : "/login"} className="flex flex-col items-center gap-1 group transition-all duration-200">
+          <Link to={user ? '/minha-conta' : '/login'} className="flex flex-col items-center gap-1 group transition-all duration-200">
             <User className="h-5 w-5 lg:h-6 lg:w-6 group-hover:scale-110 transition-transform" />
-            <span className="text-[8px] lg:text-[10px] text-black opacity-90 hidden sm:block"
-              style={{ 
+            <span
+              className="text-[8px] lg:text-[10px] text-black opacity-90 hidden sm:block"
+              style={{
                 fontFamily: 'inherit',
                 fontWeight: 'var(--store-font-weight-menu)',
                 letterSpacing: 'var(--store-header-spacing)',
@@ -161,17 +145,20 @@ const Header = ({ onMenuClick }: { onMenuClick: () => void }) => {
 
           <Link to="/favoritos" className="flex flex-col items-center gap-1 group transition-all duration-200 hidden sm:flex">
             <Heart className="h-5 w-5 lg:h-6 lg:w-6 group-hover:scale-110 transition-transform" />
-            <span className="text-[8px] lg:text-[10px] text-black opacity-90"
-              style={{ 
+            <span
+              className="text-[8px] lg:text-[10px] text-black opacity-90"
+              style={{
                 fontFamily: 'inherit',
                 fontWeight: 'var(--store-font-weight-menu)',
                 letterSpacing: 'var(--store-header-spacing)',
                 textTransform: 'var(--store-header-transform)' as any
               }}
-            >FAVORITOS</span>
+            >
+              FAVORITOS
+            </span>
           </Link>
 
-          <button 
+          <button
             onClick={() => setCartDrawerOpen(true)}
             className="flex flex-col items-center gap-1 group transition-all duration-200"
           >
@@ -183,22 +170,25 @@ const Header = ({ onMenuClick }: { onMenuClick: () => void }) => {
                 </span>
               )}
             </div>
-            <span className="text-[8px] lg:text-[10px] text-black opacity-90 hidden sm:block"
-              style={{ 
+            <span
+              className="text-[8px] lg:text-[10px] text-black opacity-90 hidden sm:block"
+              style={{
                 fontFamily: 'inherit',
                 fontWeight: 'var(--store-font-weight-menu)',
                 letterSpacing: 'var(--store-header-spacing)',
                 textTransform: 'var(--store-header-transform)' as any
               }}
-            >SACOLA</span>
+            >
+              SACOLA
+            </span>
           </button>
         </div>
       </div>
 
       <div className="px-4 pb-4 lg:hidden bg-white">
         <form onSubmit={handleSearch} className="search-wrapper">
-          <input 
-            type="text" 
+          <input
+            type="text"
             placeholder="Busque na loja..."
             className="search-input"
             value={searchTerm}
@@ -216,7 +206,7 @@ const Header = ({ onMenuClick }: { onMenuClick: () => void }) => {
 const MobileMenu = ({ isOpen, onClose, categories }: any) => {
   const { config } = useStore();
   const { user } = useAuth();
-  
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -228,6 +218,7 @@ const MobileMenu = ({ isOpen, onClose, categories }: any) => {
             onClick={onClose}
             className="fixed inset-0 bg-black/60 z-[60] backdrop-blur-sm"
           />
+
           <motion.div
             initial={{ x: '-100%' }}
             animate={{ x: 0 }}
@@ -242,6 +233,7 @@ const MobileMenu = ({ isOpen, onClose, categories }: any) => {
                   {user ? user.user_metadata?.full_name : 'Fazer Login'}
                 </p>
               </div>
+
               <button onClick={onClose} className="p-2 hover:bg-white/10 rounded-full transition-colors">
                 <X className="h-6 w-6" />
               </button>
@@ -267,9 +259,11 @@ const MobileMenu = ({ isOpen, onClose, categories }: any) => {
 
               <div className="px-6 space-y-4">
                 <h3 className="text-[10px] font-black text-brand-muted uppercase tracking-widest mb-4">Minha Conta</h3>
+
                 <Link to="/minha-conta" onClick={onClose} className="flex items-center gap-3 text-sm font-bold text-brand-foreground hover:text-brand-primary">
                   <User className="h-5 w-5" /> Perfil e Pedidos
                 </Link>
+
                 <Link to="/favoritos" onClick={onClose} className="flex items-center gap-3 text-sm font-bold text-brand-foreground hover:text-brand-primary">
                   <Heart className="h-5 w-5" /> Meus Favoritos
                 </Link>
@@ -278,8 +272,8 @@ const MobileMenu = ({ isOpen, onClose, categories }: any) => {
 
             <div className="p-6 bg-brand-primary/5 border-t border-brand-border mt-auto">
               <p className="text-[10px] font-black text-brand-muted uppercase tracking-widest mb-4">Precisando de ajuda?</p>
-              <a 
-                href={`https://wa.me/${((config as any)?.whatsapp || (config as any)?.contato?.whatsapp || '').replace(/\D/g, '')}`} 
+              <a
+                href={`https://wa.me/${((config as any)?.whatsapp || (config as any)?.contato?.whatsapp || '').replace(/\D/g, '')}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center justify-center gap-2 w-full bg-[#25D366] text-white py-4 rounded-lg font-black text-xs uppercase tracking-widest shadow-lg shadow-green-100 hover:opacity-90 transition-opacity"
@@ -299,20 +293,22 @@ const NavigationMenu = () => {
   const location = useLocation();
   const activeCategories = categories?.filter((cat: any) => cat.ativo) || [];
 
+  if (!activeCategories.length) return null;
+
   return (
     <nav className="bg-brand-background border-b border-brand-border hidden lg:block overflow-x-auto no-scrollbar">
       <div className="max-w-[1400px] mx-auto px-8 flex items-center justify-center gap-2">
         {activeCategories.map((cat: any) => (
-          <Link 
-            key={cat.id} 
+          <Link
+            key={cat.id}
             to={`/category/${cat.slug}`}
             className={cn(
-              "px-6 py-5 transition-all duration-200 border-b-2",
-              location.pathname === `/category/${cat.slug}` 
-                ? "text-brand-primary border-brand-primary bg-brand-primary/5" 
-                : "text-brand-muted border-transparent hover:text-brand-primary hover:bg-brand-primary/5"
+              'px-6 py-5 transition-all duration-200 border-b-2',
+              location.pathname === `/category/${cat.slug}`
+                ? 'text-brand-primary border-brand-primary bg-brand-primary/5'
+                : 'text-brand-muted border-transparent hover:text-brand-primary hover:bg-brand-primary/5'
             )}
-            style={{ 
+            style={{
               fontFamily: 'inherit',
               fontWeight: 'var(--store-font-weight-menu)',
               letterSpacing: 'var(--store-header-spacing)',
@@ -346,6 +342,7 @@ const Footer = () => {
             ))}
           </ul>
         </div>
+
         <div>
           <h4 className="font-bold text-sm mb-4 uppercase tracking-tight text-inherit">ATENDIMENTO</h4>
           <ul className="text-sm text-brand-muted space-y-2">
@@ -360,6 +357,7 @@ const Footer = () => {
             </li>
           </ul>
         </div>
+
         <div>
           <h4 className="font-bold text-sm mb-4 uppercase tracking-tight text-inherit">CATEGORIAS</h4>
           <ul className="text-sm text-brand-muted space-y-2">
@@ -368,13 +366,9 @@ const Footer = () => {
                 <Link to={`/category/${cat.slug}`}>{cat.nome}</Link>
               </li>
             ))}
-            {categories?.length > 8 && (
-              <li className="hover:text-brand-primary cursor-pointer transition-colors duration-200 font-bold">
-                <Link to="/">Ver todas →</Link>
-              </li>
-            )}
           </ul>
         </div>
+
         <div>
           <h4 className="font-bold text-sm mb-4 uppercase tracking-tight text-inherit">REDES SOCIAIS</h4>
           <div className="flex gap-4">
@@ -383,6 +377,7 @@ const Footer = () => {
                 <Instagram className="h-5 w-5" />
               </a>
             )}
+
             {config?.facebook && (
               <a href={config.facebook} target="_blank" rel="noopener noreferrer" className="h-10 w-10 bg-brand-secondary rounded-full flex items-center justify-center hover:bg-brand-primary hover:text-brand-primary-foreground transition-all duration-200 text-inherit">
                 <Facebook className="h-5 w-5" />
@@ -391,8 +386,11 @@ const Footer = () => {
           </div>
         </div>
       </div>
+
       <div className="max-w-[1400px] mx-auto px-4 border-t border-brand-border pt-8 text-center">
-        <p className="text-xs text-brand-muted font-medium tracking-tight">© {new Date().getFullYear()} {config?.nome_loja || 'Loja Virtual'}. Todos os direitos reservados.</p>
+        <p className="text-xs text-brand-muted font-medium tracking-tight">
+          © {new Date().getFullYear()} {config?.nome_loja || 'Loja Virtual'}. Todos os direitos reservados.
+        </p>
       </div>
     </footer>
   );
@@ -400,7 +398,25 @@ const Footer = () => {
 
 export const Layout = ({ children }: any) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { categories }: any = useStore();
+
+  const {
+    categories,
+    loading,
+    fetchFromSupabase
+  }: any = useStore();
+
+  useEffect(() => {
+    fetchFromSupabase();
+  }, [fetchFromSupabase]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-white">
+        <div className="w-12 h-12 border-4 border-[#F2AE49] border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
   const activeCategories = categories?.filter((cat: any) => cat.ativo) || [];
 
   return (
@@ -408,12 +424,15 @@ export const Layout = ({ children }: any) => {
       <TopBar />
       <Header onMenuClick={() => setMobileMenuOpen(true)} />
       <NavigationMenu />
-      <MobileMenu 
-        isOpen={mobileMenuOpen} 
-        onClose={() => setMobileMenuOpen(false)} 
+
+      <MobileMenu
+        isOpen={mobileMenuOpen}
+        onClose={() => setMobileMenuOpen(false)}
         categories={activeCategories}
       />
+
       <CartDrawer />
+
       <main className="flex-1 w-full max-w-full overflow-hidden">
         {children}
       </main>
