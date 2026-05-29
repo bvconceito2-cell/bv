@@ -5,7 +5,6 @@
   --font-sans: var(--store-font-body), "Outfit", sans-serif;
   --font-heading: var(--store-font-heading), "Outfit", sans-serif;
 
-  /* Color Mapping from Store Design Tokens */
   --color-brand-primary: var(--store-primary);
   --color-brand-primary-foreground: var(--store-button-text);
   --color-brand-primary-hover: var(--store-primary-hover);
@@ -26,7 +25,6 @@
 }
 
 :root {
-  /* Store Design Tokens (Defaults) */
   --store-font-primary: "Outfit";
   --store-font-body: var(--store-font-primary);
   --store-font-heading: var(--store-font-primary);
@@ -36,20 +34,17 @@
   --store-font-weight-price: 900;
   --store-font-weight-text: 400;
 
-  /* Header Default Tokens */
   --store-header-font: var(--store-font-heading);
   --store-header-weight: 900;
   --store-header-spacing: 0.2em;
   --store-header-transform: uppercase;
   --store-header-size: 14px;
 
-  /* Conceito Calçados */
   --store-primary: #F2AE49;
   --store-background: #ffffff;
   --store-text: #111111;
   --store-highlight: #D4B483;
 
-  /* Derived Variables */
   --store-primary-hover: #E09A3C;
   --store-button: var(--store-primary);
   --store-button-text: #ffffff;
@@ -61,7 +56,6 @@
   --store-radius-card: 12px;
   --store-radius-button: 8px;
 
-  /* Semantic Dynamic Variables */
   --price-color: var(--store-primary);
   --discount-color: var(--store-highlight);
   --input-background: var(--store-background);
@@ -96,7 +90,6 @@ html {
   font-weight: var(--store-font-weight-title) !important;
 }
 
-/* Force global font on all descendants within store-theme */
 .store-theme * {
   font-family: inherit;
 }
@@ -104,20 +97,19 @@ html {
 .admin-theme {
   font-family: "Outfit", sans-serif !important;
 
-  /* Fixed admin colors to prevent store theme inheritance */
-  --store-primary: #F2AE49;
-  --store-primary-hover: #E09A3C;
+  --store-primary: #04548c;
+  --store-primary-hover: #03426d;
   --store-background: #ffffff;
   --store-text: #111111;
-  --store-highlight: #D4B483;
+  --store-highlight: #22c55e;
   --store-card: #ffffff;
   --store-border: #e5e7eb;
   --store-button-text: #ffffff;
   --store-font-heading: "Outfit";
   --store-font-body: "Outfit";
 
-  --primary: #F2AE49;
-  --brand-primary: #F2AE49;
+  --primary: #04548c;
+  --brand-primary: #04548c;
   --brand-secondary: #f5f5f5;
   --brand-background: #F8F9FA;
   --brand-card: #ffffff;
@@ -147,18 +139,15 @@ body {
   scrollbar-width: none;
 }
 
-/* Prevent image dragging on mobile */
 img {
   user-select: none;
   -webkit-user-drag: none;
 }
 
-/* Smooth transitions for all elements */
 * {
   @apply transition-colors duration-200;
 }
 
-/* Fix for mobile input zoom */
 @media screen and (max-width: 768px) {
   input,
   select,
@@ -167,7 +156,6 @@ img {
   }
 }
 
-/* Premium Search Styles */
 .search-wrapper {
   @apply relative w-full flex items-center transition-all duration-300;
 }
