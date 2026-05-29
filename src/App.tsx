@@ -2,7 +2,6 @@ import React, { Suspense, lazy } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'sonner';
 
-// Lazy loading components
 const HomePage = lazy(() => import('./pages/HomePage'));
 const ProductPage = lazy(() => import('./pages/ProductPage'));
 const CategoryPage = lazy(() => import('./pages/CategoryPage'));
@@ -10,7 +9,6 @@ const CartPage = lazy(() => import('./pages/CartPage'));
 const CheckoutPage = lazy(() => import('./pages/CheckoutPage'));
 const InstitutionalPage = lazy(() => import('./pages/InstitutionalPage'));
 
-// User Auth Pages
 const LoginPage = lazy(() => import('./pages/auth/LoginPage'));
 const RegisterPage = lazy(() => import('./pages/auth/RegisterPage'));
 const AccountPage = lazy(() => import('./pages/user/AccountPage'));
@@ -26,7 +24,6 @@ const ImportProducts = lazy(() => import('./pages/admin/produtos/ImportProducts'
 const CategoryList = lazy(() => import('./pages/admin/categorias/CategoryList'));
 const OrderList = lazy(() => import('./pages/admin/pedidos/OrderList'));
 const OrderDetail = lazy(() => import('./pages/admin/pedidos/OrderDetail'));
-
 
 const ClientList = lazy(() => import('./pages/admin/clientes/ClientList'));
 const ClientProfile = lazy(() => import('./pages/admin/clientes/ClientProfile'));
@@ -50,10 +47,6 @@ const TemplateDiagnostic = lazy(() => import('./pages/admin/Diagnostic'));
 const MelhorEnvioCallback = lazy(() => import('./pages/admin/integracoes/MelhorEnvioCallback'));
 const InstitutionalPages = lazy(() => import('./pages/admin/paginas/InstitutionalPages'));
 
-
-
-
-
 import AdminLayout from './components/admin/layout/AdminLayout';
 import { AuthProvider } from './contexts/AuthContext';
 import { ProtectedAdminRoute } from './components/admin/ProtectedAdminRoute';
@@ -67,6 +60,11 @@ const PageLoader = () => (
   </div>
 );
 
+const StoreShell = ({ children }: { children: React.ReactNode }) => (
+  <div className="store-theme min-h-screen">
+    {children}
+  </div>
+);
 
 function App() {
   return (
@@ -76,30 +74,27 @@ function App() {
         <Toaster position="top-right" expand={true} richColors />
         <Suspense fallback={<PageLoader />}>
           <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/produto/:id" element={<ProductPage />} />
-            <Route path="/category/:id" element={<CategoryPage />} />
-            <Route path="/carrinho" element={<CartPage />} />
-            <Route path="/pagina/:slug" element={<InstitutionalPage />} />
-            
-            {/* Auth Routes */}
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/cadastro" element={<RegisterPage />} />
-            
-            {/* User Protected Routes */}
-            <Route path="/minha-conta" element={<ProtectedUserRoute><AccountPage /></ProtectedUserRoute>} />
-            <Route path="/meus-pedidos" element={<ProtectedUserRoute><MyOrdersPage /></ProtectedUserRoute>} />
-            <Route path="/favoritos" element={<FavoritesPage />} />
+            <Route path="/" element={<StoreShell><HomePage /></StoreShell>} />
+            <Route path="/produto/:id" element={<StoreShell><ProductPage /></StoreShell>} />
+            <Route path="/category/:id" element={<StoreShell><CategoryPage /></StoreShell>} />
+            <Route path="/carrinho" element={<StoreShell><CartPage /></StoreShell>} />
+            <Route path="/pagina/:slug" element={<StoreShell><InstitutionalPage /></StoreShell>} />
 
-            <Route path="/checkout" element={<CheckoutPage />} />
-            <Route path="/checkout/sucesso" element={<CheckoutPage />} />
-            <Route path="/checkout/pendente" element={<CheckoutPage />} />
-            <Route path="/checkout/erro" element={<CheckoutPage />} />
+            <Route path="/login" element={<StoreShell><LoginPage /></StoreShell>} />
+            <Route path="/cadastro" element={<StoreShell><RegisterPage /></StoreShell>} />
 
-            {/* Admin Routes */}
+            <Route path="/minha-conta" element={<StoreShell><ProtectedUserRoute><AccountPage /></ProtectedUserRoute></StoreShell>} />
+            <Route path="/meus-pedidos" element={<StoreShell><ProtectedUserRoute><MyOrdersPage /></ProtectedUserRoute></StoreShell>} />
+            <Route path="/favoritos" element={<StoreShell><FavoritesPage /></StoreShell>} />
+
+            <Route path="/checkout" element={<StoreShell><CheckoutPage /></StoreShell>} />
+            <Route path="/checkout/sucesso" element={<StoreShell><CheckoutPage /></StoreShell>} />
+            <Route path="/checkout/pendente" element={<StoreShell><CheckoutPage /></StoreShell>} />
+            <Route path="/checkout/erro" element={<StoreShell><CheckoutPage /></StoreShell>} />
+
             <Route path="/admin/login" element={<AdminLogin />} />
             <Route path="/admin" element={<Navigate to="/admin/login" replace />} />
-            
+
             <Route path="/admin/dashboard" element={<ProtectedAdminRoute><AdminLayout><AdminDashboard /></AdminLayout></ProtectedAdminRoute>} />
             <Route path="/admin/produtos" element={<ProtectedAdminRoute><AdminLayout><ProductList /></AdminLayout></ProtectedAdminRoute>} />
             <Route path="/admin/produtos/novo" element={<ProtectedAdminRoute><AdminLayout><ProductForm /></AdminLayout></ProtectedAdminRoute>} />
@@ -109,7 +104,6 @@ function App() {
             <Route path="/admin/categorias" element={<ProtectedAdminRoute><AdminLayout><CategoryList /></AdminLayout></ProtectedAdminRoute>} />
             <Route path="/admin/pedidos" element={<ProtectedAdminRoute><AdminLayout><OrderList /></AdminLayout></ProtectedAdminRoute>} />
             <Route path="/admin/pedidos/:id" element={<ProtectedAdminRoute><AdminLayout><OrderDetail /></AdminLayout></ProtectedAdminRoute>} />
-            
 
             <Route path="/admin/clientes" element={<ProtectedAdminRoute><AdminLayout><ClientList /></AdminLayout></ProtectedAdminRoute>} />
             <Route path="/admin/clientes/:id" element={<ProtectedAdminRoute><AdminLayout><ClientProfile /></AdminLayout></ProtectedAdminRoute>} />
@@ -134,14 +128,12 @@ function App() {
             <Route path="/admin/logs" element={<ProtectedAdminRoute><AdminLayout><SystemLogs /></AdminLayout></ProtectedAdminRoute>} />
             <Route path="/admin/monitoramento" element={<ProtectedAdminRoute><AdminLayout><MonitoringPage /></AdminLayout></ProtectedAdminRoute>} />
 
-
-
-            <Route path="*" element={<HomePage />} />
+            <Route path="*" element={<StoreShell><HomePage /></StoreShell>} />
           </Routes>
         </Suspense>
       </BrowserRouter>
-
     </AuthProvider>
   );
 }
+
 export default App;
