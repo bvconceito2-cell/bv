@@ -1,0 +1,17 @@
+{
+  "nome_loja": "Bora Heart Glow",
+  "tagline": "Sua melhor experiência de compra",
+  "topBar": {
+    "texto": "✨ FRETE GRÁTIS acima de R$199 · Parcele em até 5x sem juros",
+    "ativo": true
+  },
+  "redesSociais": {
+    "instagram": "https://instagram.com/boraheartglow",
+    "facebook": "",
+    "pinterest": ""
+  },
+  "contato": {
+    "email": "contato@boraheartglow.com",
+    "whatsapp": "5500000000000"
+  }
+}

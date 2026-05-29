@@ -1,0 +1,10 @@
+project_id = "nricvyfulltmbljmjbop"
+
+[functions.frete-calcular]
+verify_jwt = false
+
+[functions.checkout-criar]
+verify_jwt = false
+
+[functions.webhook-mercadopago]
+verify_jwt = false

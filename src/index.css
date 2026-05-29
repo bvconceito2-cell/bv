@@ -1,0 +1,212 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100;200;300;400;500;600;700;800;900&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: var(--store-font-body), "Outfit", sans-serif;
+  --font-heading: var(--store-font-heading), "Outfit", sans-serif;
+
+  /* Color Mapping from Store Design Tokens */
+  --color-brand-primary: var(--store-primary);
+  --color-brand-primary-foreground: var(--store-button-text);
+  --color-brand-primary-hover: var(--store-primary-hover);
+  --color-brand-secondary: color-mix(in srgb, var(--store-primary), transparent 90%);
+  --color-brand-secondary-foreground: var(--store-primary);
+  --color-brand-background: var(--store-background);
+  --color-brand-foreground: var(--store-text);
+  --color-brand-muted: var(--store-text-muted);
+  --color-brand-border: var(--store-border);
+  --color-brand-card: var(--store-card);
+  --color-brand-highlight: var(--store-highlight);
+  --color-brand-highlight-foreground: var(--store-highlight-foreground);
+  --color-brand-button: var(--store-button);
+  --color-brand-button-text: var(--store-button-text);
+  
+  --radius-brand-card: var(--store-radius-card);
+  --radius-brand-button: var(--store-radius-button);
+}
+
+:root {
+  /* Store Design Tokens (Defaults) */
+  --store-font-primary: "Outfit";
+  --store-font-body: var(--store-font-primary);
+  --store-font-heading: var(--store-font-primary);
+  --store-font-weight-title: 900;
+  --store-font-weight-body: 400;
+  --store-font-weight-menu: 900;
+  --store-font-weight-price: 900;
+  --store-font-weight-text: 400;
+
+  /* Header Default Tokens */
+  --store-header-font: var(--store-font-heading);
+  --store-header-weight: 900;
+  --store-header-spacing: 0.2em;
+  --store-header-transform: uppercase;
+  --store-header-size: 14px;
+  
+  /* Primary 4 Colors */
+  --store-primary: #04548c;
+  --store-background: #ffffff;
+  --store-text: #111111;
+  --store-highlight: #22c55e;
+
+  /* Derived Variables (Calculated dynamically via useStore or Fallbacks) */
+  --store-primary-hover: #03426d;
+  --store-button: var(--store-primary);
+  --store-button-text: #ffffff;
+  --store-card: #ffffff;
+  --store-border: #e5e7eb;
+  --store-text-muted: #6b7280;
+  --store-highlight-foreground: #ffffff;
+  
+  --store-radius-card: 12px;
+  --store-radius-button: 8px;
+
+  /* Semantic Dynamic Variables */
+  --price-color: var(--store-primary);
+  --discount-color: var(--store-highlight);
+  --input-background: var(--store-background);
+  --input-border: var(--store-border);
+  --header-background: var(--store-primary);
+  --header-foreground: var(--store-button-text);
+  --footer-background: var(--store-background);
+  --footer-foreground: var(--store-text);
+}
+
+
+html {
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+  width: 100vw;
+}
+
+.store-theme {
+  font-family: var(--store-font-body), sans-serif !important;
+  font-weight: var(--store-font-weight-body) !important;
+  @apply text-brand-foreground bg-brand-background antialiased transition-colors duration-200;
+}
+
+.store-theme h1, 
+.store-theme h2, 
+.store-theme h3, 
+.store-theme h4, 
+.store-theme h5, 
+.store-theme h6, 
+.store-theme .font-heading,
+.store-theme [class*="font-"] {
+  font-family: var(--store-font-heading), sans-serif !important;
+  font-weight: var(--store-font-weight-title) !important;
+}
+
+/* Force global font on all descendants within store-theme */
+.store-theme * {
+  font-family: inherit;
+}
+
+.admin-theme {
+  font-family: "Outfit", sans-serif !important;
+  /* Fixed admin colors to prevent store theme inheritance */
+  --store-primary: #04548c;
+  --store-primary-hover: #03426d;
+  --store-background: #ffffff;
+  --store-text: #111111;
+  --store-highlight: #22c55e;
+  --store-card: #ffffff;
+  --store-border: #e5e7eb;
+  --store-button-text: #ffffff;
+  --store-font-heading: "Outfit";
+  --store-font-body: "Outfit";
+  
+  --primary: #04548c;
+  --brand-primary: #04548c;
+  --brand-secondary: #f5f5f5;
+  --brand-background: #F8F9FA;
+  --brand-card: #ffffff;
+  --brand-border: #e5e7eb;
+  --brand-muted: #6b7280;
+  
+  background-color: #F8F9FA;
+}
+
+.admin-theme * {
+  font-family: "Outfit", sans-serif !important;
+}
+
+body {
+  @apply antialiased;
+  overflow-x: hidden;
+  width: 100vw;
+  position: relative;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Prevent image dragging on mobile */
+img {
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* Smooth transitions for all elements */
+* {
+  @apply transition-colors duration-200;
+}
+
+/* Fix for mobile input zoom */
+@media screen and (max-width: 768px) {
+  input, select, textarea {
+    font-size: 16px !important;
+  }
+}
+
+/* Premium Search Styles */
+.search-wrapper {
+  @apply relative w-full flex items-center transition-all duration-300;
+}
+
+.search-input {
+  @apply w-full h-12 px-6 pr-14 rounded-full border border-[var(--input-border)] 
+         bg-[var(--input-background)] text-brand-foreground outline-none
+         transition-all duration-300 shadow-sm
+         placeholder:text-brand-muted/70 placeholder:font-normal;
+  font-family: inherit;
+  font-size: 13px;
+  letter-spacing: 0.01em;
+}
+
+.search-input:hover {
+  @apply border-brand-primary/20;
+}
+
+.search-input:focus {
+  @apply border-brand-primary/40 ring-4 ring-brand-primary/5 shadow-md;
+}
+
+.search-button {
+  @apply absolute right-1.5 top-1/2 -translate-y-1/2 flex items-center justify-center w-9 h-9 
+         bg-brand-primary text-brand-primary-foreground rounded-full
+         transition-all duration-300 hover:scale-105 active:scale-95
+         hover:bg-brand-primary-hover;
+}
+
+.search-button svg {
+  @apply w-[18px] h-[18px] stroke-[2.5px];
+}
+
+@media screen and (max-width: 1024px) {
+  .search-input {
+    @apply h-11 pr-12;
+    font-size: 15px !important;
+  }
+  .search-button {
+    @apply w-8 h-8 right-1.5;
+  }
+  .search-button svg {
+    @apply w-4 h-4;
+  }
+}

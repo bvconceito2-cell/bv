@@ -1,0 +1,50 @@
+[
+  {
+    "id": 1,
+    "nome": "Vestidos",
+    "slug": "vestidos",
+    "imagem": "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=200&h=200&fit=crop&crop=faces"
+  },
+  {
+    "id": 2,
+    "nome": "Blusas",
+    "slug": "blusas",
+    "imagem": "https://images.unsplash.com/photo-1564257631407-4deb1f99d992?w=200&h=200&fit=crop&crop=top"
+  },
+  {
+    "id": 3,
+    "nome": "Calças",
+    "slug": "calcas",
+    "imagem": "https://images.unsplash.com/photo-1509551388413-e18d0ac5d495?w=200&h=200&fit=crop&crop=top"
+  },
+  {
+    "id": 4,
+    "nome": "Saias",
+    "slug": "saias",
+    "imagem": "https://images.unsplash.com/photo-1583496661160-fb5886a0aaaa?w=200&h=200&fit=crop&crop=top"
+  },
+  {
+    "id": 5,
+    "nome": "Casacos",
+    "slug": "casacos",
+    "imagem": "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=200&h=200&fit=crop&crop=top"
+  },
+  {
+    "id": 6,
+    "nome": "Plus Size",
+    "slug": "plus-size",
+    "imagem": "https://images.unsplash.com/photo-1612336307429-8a898d10e223?w=200&h=200&fit=crop&crop=faces"
+  },
+  {
+    "id": 7,
+    "nome": "Lingerie",
+    "slug": "lingerie",
+    "imagem": "https://images.unsplash.com/photo-1621184455862-c163dfb30e0f?w=200&h=200&fit=crop&crop=top"
+  },
+  {
+    "id": 8,
+    "nome": "Acessórios",
+    "slug": "acessorios",
+    "imagem": "https://images.unsplash.com/photo-1617038220319-276d3cfab638?w=200&h=200&fit=crop&crop=center"
+  }
+]
