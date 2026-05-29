@@ -20,7 +20,7 @@
   --color-brand-highlight-foreground: var(--store-highlight-foreground);
   --color-brand-button: var(--store-button);
   --color-brand-button-text: var(--store-button-text);
-  
+
   --radius-brand-card: var(--store-radius-card);
   --radius-brand-button: var(--store-radius-button);
 }
@@ -42,22 +42,22 @@
   --store-header-spacing: 0.2em;
   --store-header-transform: uppercase;
   --store-header-size: 14px;
-  
-  /* Primary 4 Colors */
-  --store-primary: #04548c;
+
+  /* Conceito Calçados */
+  --store-primary: #F2AE49;
   --store-background: #ffffff;
   --store-text: #111111;
-  --store-highlight: #22c55e;
+  --store-highlight: #D4B483;
 
-  /* Derived Variables (Calculated dynamically via useStore or Fallbacks) */
-  --store-primary-hover: #03426d;
+  /* Derived Variables */
+  --store-primary-hover: #E09A3C;
   --store-button: var(--store-primary);
   --store-button-text: #ffffff;
   --store-card: #ffffff;
   --store-border: #e5e7eb;
   --store-text-muted: #6b7280;
-  --store-highlight-foreground: #ffffff;
-  
+  --store-highlight-foreground: #111111;
+
   --store-radius-card: 12px;
   --store-radius-button: 8px;
 
@@ -66,12 +66,11 @@
   --discount-color: var(--store-highlight);
   --input-background: var(--store-background);
   --input-border: var(--store-border);
-  --header-background: var(--store-primary);
-  --header-foreground: var(--store-button-text);
-  --footer-background: var(--store-background);
-  --footer-foreground: var(--store-text);
+  --header-background: #ffffff;
+  --header-foreground: #111111;
+  --footer-background: #050816;
+  --footer-foreground: #ffffff;
 }
-
 
 html {
   scroll-behavior: smooth;
@@ -85,12 +84,12 @@ html {
   @apply text-brand-foreground bg-brand-background antialiased transition-colors duration-200;
 }
 
-.store-theme h1, 
-.store-theme h2, 
-.store-theme h3, 
-.store-theme h4, 
-.store-theme h5, 
-.store-theme h6, 
+.store-theme h1,
+.store-theme h2,
+.store-theme h3,
+.store-theme h4,
+.store-theme h5,
+.store-theme h6,
 .store-theme .font-heading,
 .store-theme [class*="font-"] {
   font-family: var(--store-font-heading), sans-serif !important;
@@ -104,26 +103,27 @@ html {
 
 .admin-theme {
   font-family: "Outfit", sans-serif !important;
+
   /* Fixed admin colors to prevent store theme inheritance */
-  --store-primary: #04548c;
-  --store-primary-hover: #03426d;
+  --store-primary: #F2AE49;
+  --store-primary-hover: #E09A3C;
   --store-background: #ffffff;
   --store-text: #111111;
-  --store-highlight: #22c55e;
+  --store-highlight: #D4B483;
   --store-card: #ffffff;
   --store-border: #e5e7eb;
   --store-button-text: #ffffff;
   --store-font-heading: "Outfit";
   --store-font-body: "Outfit";
-  
-  --primary: #04548c;
-  --brand-primary: #04548c;
+
+  --primary: #F2AE49;
+  --brand-primary: #F2AE49;
   --brand-secondary: #f5f5f5;
   --brand-background: #F8F9FA;
   --brand-card: #ffffff;
   --brand-border: #e5e7eb;
   --brand-muted: #6b7280;
-  
+
   background-color: #F8F9FA;
 }
 
@@ -141,6 +141,7 @@ body {
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
+
 .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
@@ -159,7 +160,9 @@ img {
 
 /* Fix for mobile input zoom */
 @media screen and (max-width: 768px) {
-  input, select, textarea {
+  input,
+  select,
+  textarea {
     font-size: 16px !important;
   }
 }
@@ -170,7 +173,7 @@ img {
 }
 
 .search-input {
-  @apply w-full h-12 px-6 pr-14 rounded-full border border-[var(--input-border)] 
+  @apply w-full h-12 px-6 pr-14 rounded-full border border-[var(--input-border)]
          bg-[var(--input-background)] text-brand-foreground outline-none
          transition-all duration-300 shadow-sm
          placeholder:text-brand-muted/70 placeholder:font-normal;
@@ -188,7 +191,7 @@ img {
 }
 
 .search-button {
-  @apply absolute right-1.5 top-1/2 -translate-y-1/2 flex items-center justify-center w-9 h-9 
+  @apply absolute right-1.5 top-1/2 -translate-y-1/2 flex items-center justify-center w-9 h-9
          bg-brand-primary text-brand-primary-foreground rounded-full
          transition-all duration-300 hover:scale-105 active:scale-95
          hover:bg-brand-primary-hover;
@@ -203,9 +206,11 @@ img {
     @apply h-11 pr-12;
     font-size: 15px !important;
   }
+
   .search-button {
     @apply w-8 h-8 right-1.5;
   }
+
   .search-button svg {
     @apply w-4 h-4;
   }
