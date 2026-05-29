@@ -19,11 +19,7 @@ export const useStore = create((set: any, get: any) => ({
   loading: true,
 
   fetchFromSupabase: async (force = false) => {
-    if (
-      !force &&
-      get().lastFetch &&
-      Date.now() - get().lastFetch < 300000
-    ) {
+    if (!force && get().lastFetch && Date.now() - get().lastFetch < 300000) {
       return;
     }
 
@@ -41,55 +37,15 @@ export const useStore = create((set: any, get: any) => ({
         { data: dbPromotional, error: prError },
         { data: dbPages, error: pgError }
       ] = await Promise.all([
-        supabase
-          .from('produtos')
-          .select('*')
-          .order('created_at', { ascending: false }),
-
-        supabase
-          .from('categorias')
-          .select('*')
-          .eq('ativo', true)
-          .order('ordem', { ascending: true }),
-
-        supabase
-          .from('banners_hero')
-          .select('*')
-          .eq('ativo', true)
-          .order('ordem', { ascending: true }),
-
-        supabase
-          .from('aparencia')
-          .select('*')
-          .limit(1)
-          .maybeSingle(),
-
-        supabase
-          .from('secoes_home')
-          .select('*')
-          .order('ordem', { ascending: true }),
-
-        supabase
-          .from('configuracoes')
-          .select('*'),
-
-        supabase
-          .from('banner_editorial')
-          .select('*')
-          .limit(1)
-          .maybeSingle(),
-
-        supabase
-          .from('banners_promocionais')
-          .select('*')
-          .eq('ativo', true)
-          .order('ordem', { ascending: true }),
-
-        (supabase
-          .from('paginas_institucionais' as any)
-          .select('*') as any)
-          .eq('ativo', true)
-          .order('ordem', { ascending: true })
+        supabase.from('produtos').select('*').order('created_at', { ascending: false }),
+        supabase.from('categorias').select('*').eq('ativo', true).order('ordem', { ascending: true }),
+        supabase.from('banners_hero').select('*').eq('ativo', true).order('ordem', { ascending: true }),
+        supabase.from('aparencia').select('*').limit(1).maybeSingle(),
+        supabase.from('secoes_home').select('*').order('ordem', { ascending: true }),
+        supabase.from('configuracoes').select('*'),
+        supabase.from('banner_editorial').select('*').limit(1).maybeSingle(),
+        supabase.from('banners_promocionais').select('*').eq('ativo', true).order('ordem', { ascending: true }),
+        (supabase.from('paginas_institucionais' as any).select('*') as any).eq('ativo', true).order('ordem', { ascending: true })
       ]);
 
       if (pError) console.error('Error fetching products:', pError);
@@ -112,14 +68,9 @@ export const useStore = create((set: any, get: any) => ({
             description: p.descricao,
             price_original: p.preco_original || 0,
             price_current: p.preco_atual || 0,
-            discount:
-              p.preco_original && p.preco_atual
-                ? Math.round(
-                    ((p.preco_original - p.preco_atual) /
-                      (p.preco_original || 1)) *
-                      100
-                  )
-                : 0,
+            discount: p.preco_original && p.preco_atual
+              ? Math.round(((p.preco_original - p.preco_atual) / (p.preco_original || 1)) * 100)
+              : 0,
             images: p.imagens || [],
             main_image: p.imagem_principal || p.imagens?.[0] || '',
             media: p.midias || [],
@@ -141,231 +92,189 @@ export const useStore = create((set: any, get: any) => ({
         categories: !cError && Array.isArray(dbCategories) ? dbCategories : [],
         banners: !bError && Array.isArray(dbBanners) ? dbBanners : [],
         editorial: !eError && dbEditorial ? dbEditorial : null,
-        promotionalBanners:
-          !prError && Array.isArray(dbPromotional) ? dbPromotional : [],
+        promotionalBanners: !prError && Array.isArray(dbPromotional) ? dbPromotional : [],
         pages: !pgError && Array.isArray(dbPages) ? dbPages : [],
         homeSections: !sError && Array.isArray(dbSections) ? dbSections : []
       });
 
-      if (!aError && dbAppearance) {
-        set({ appearance: dbAppearance });
+      const getContrastColor = (hex: string) => {
+        if (!hex || hex === 'transparent') return '#ffffff';
+        const cleanHex = hex.replace('#', '');
+        if (cleanHex.length !== 6) return '#ffffff';
 
-        const colors = (dbAppearance as any).cores_primarias || {
-          brand: '#04548c',
+        const r = parseInt(cleanHex.slice(0, 2), 16);
+        const g = parseInt(cleanHex.slice(2, 4), 16);
+        const b = parseInt(cleanHex.slice(4, 6), 16);
+
+        if (Number.isNaN(r) || Number.isNaN(g) || Number.isNaN(b)) return '#ffffff';
+
+        const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+        return luminance > 0.5 ? '#111111' : '#ffffff';
+      };
+
+      const adjustColor = (hex: string, amount: number) => {
+        if (!hex || !hex.startsWith('#') || hex.length !== 7) return hex;
+
+        const clamp = (val: number) => Math.min(Math.max(val, 0), 255);
+
+        const r = clamp(parseInt(hex.slice(1, 3), 16) + amount);
+        const g = clamp(parseInt(hex.slice(3, 5), 16) + amount);
+        const b = clamp(parseInt(hex.slice(5, 7), 16) + amount);
+
+        if (Number.isNaN(r) || Number.isNaN(g) || Number.isNaN(b)) return hex;
+
+        return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+      };
+
+      const fallbackAppearance = {
+        cores_primarias: {
+          brand: '#F2AE49',
           background: '#ffffff',
           text: '#111111',
-          highlight: '#22c55e'
-        };
+          highlight: '#D4B483'
+        },
+        fontes: {
+          heading: 'Outfit',
+          body: 'Outfit'
+        },
+        layout: {
+          card_radius: 12,
+          button_radius: 8,
+          header_font: 'Outfit',
+          header_weight: '900',
+          header_spacing: '0.2',
+          header_transform: 'uppercase',
+          header_size: '14'
+        }
+      };
 
-        const getContrastColor = (hex: string) => {
-          if (!hex || hex === 'transparent') return '#ffffff';
+      const appearanceData = !aError && dbAppearance ? dbAppearance : fallbackAppearance;
 
-          const cleanHex = hex.replace('#', '');
+      set({ appearance: appearanceData });
 
-          if (cleanHex.length !== 6) return '#ffffff';
+      const colors = (appearanceData as any).cores_primarias || fallbackAppearance.cores_primarias;
 
-          const r = parseInt(cleanHex.slice(0, 2), 16);
-          const g = parseInt(cleanHex.slice(2, 4), 16);
-          const b = parseInt(cleanHex.slice(4, 6), 16);
+      const primary = colors.brand || '#F2AE49';
+      const background = colors.background || '#ffffff';
+      const text = colors.text || '#111111';
+      const highlight = colors.highlight || '#D4B483';
 
-          const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+      const dynamicStyles = `
+        .store-theme {
+          --store-primary: ${primary};
+          --store-primary-hover: ${adjustColor(primary, -30)};
+          --store-background: ${background};
+          --store-text: ${text};
+          --store-text-muted: ${adjustColor(text, 50)};
+          --store-highlight: ${highlight};
+          --store-highlight-foreground: ${getContrastColor(highlight)};
+          --store-card: ${background === '#ffffff' ? '#ffffff' : adjustColor(background, 10)};
+          --store-border: ${background === '#ffffff' ? '#e5e7eb' : adjustColor(background, -20)};
+          --store-button: ${primary};
+          --store-button-text: ${getContrastColor(primary)};
 
-          return luminance > 0.5 ? '#111111' : '#ffffff';
-        };
+          --price-color: ${primary};
+          --discount-color: ${highlight};
+          --header-background: ${background};
+          --header-foreground: ${text};
+          --footer-background: #050816;
+          --footer-foreground: #ffffff;
+          --input-background: ${background};
+          --input-border: ${background === '#ffffff' ? '#e5e7eb' : adjustColor(background, -20)};
+        }
+      `;
 
-        const adjustColor = (hex: string, amount: number) => {
-          if (!hex || !hex.startsWith('#') || hex.length !== 7) return hex;
+      let styleTag = document.getElementById('store-dynamic-colors');
 
-          const clamp = (val: number) => Math.min(Math.max(val, 0), 255);
+      if (!styleTag) {
+        styleTag = document.createElement('style');
+        styleTag.id = 'store-dynamic-colors';
+        document.head.appendChild(styleTag);
+      }
 
-          const r = clamp(parseInt(hex.slice(1, 3), 16) + amount);
-          const g = clamp(parseInt(hex.slice(3, 5), 16) + amount);
-          const b = clamp(parseInt(hex.slice(5, 7), 16) + amount);
+      styleTag.innerHTML = dynamicStyles;
 
-          return `#${r.toString(16).padStart(2, '0')}${g
-            .toString(16)
-            .padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
-        };
+      const layout = (appearanceData as any).layout || fallbackAppearance.layout;
 
-        const primary = colors.brand || '#04548c';
-        const background = colors.background || '#ffffff';
-        const text = colors.text || '#111111';
-        const highlight = colors.highlight || '#22c55e';
+      const layoutStyles = `
+        .store-theme {
+          --store-radius-card: ${layout.card_radius ?? 12}px;
+          --store-radius-button: ${layout.button_radius ?? 8}px;
+          --store-header-font: "${layout.header_font || 'Outfit'}";
+          --store-header-weight: ${layout.header_weight || '900'};
+          --store-font-weight-menu: ${layout.header_weight || '900'};
+          --store-header-spacing: ${layout.header_spacing || '0.2'}em;
+          --store-header-transform: ${layout.header_transform || 'uppercase'};
+          --store-header-size: ${layout.header_size || '14'}px;
+        }
+      `;
 
-        const dynamicStyles = `
-          .store-theme {
-            --store-primary: ${primary};
-            --store-primary-hover: ${adjustColor(primary, -30)};
-            --store-background: ${background};
-            --store-text: ${text};
-            --store-text-muted: ${adjustColor(text, 50)};
-            --store-highlight: ${highlight};
-            --store-highlight-foreground: ${getContrastColor(highlight)};
-            --store-card: ${background === '#ffffff' ? '#ffffff' : adjustColor(background, 10)};
-            --store-border: ${adjustColor(background, -20)};
-            --store-button: ${primary};
-            --store-button-text: ${getContrastColor(primary)};
+      let layoutStyleTag = document.getElementById('store-dynamic-layout');
 
-            --price-color: ${primary};
-            --discount-color: ${highlight};
-            --header-background: ${primary};
-            --header-foreground: ${getContrastColor(primary)};
-            --footer-background: ${background};
-            --footer-foreground: ${text};
-            --input-background: ${background};
-            --input-border: ${adjustColor(background, -20)};
-          }
-        `;
+      if (!layoutStyleTag) {
+        layoutStyleTag = document.createElement('style');
+        layoutStyleTag.id = 'store-dynamic-layout';
+        document.head.appendChild(layoutStyleTag);
+      }
 
-        let styleTag = document.getElementById('store-dynamic-colors');
+      layoutStyleTag.innerHTML = layoutStyles;
 
-        if (!styleTag) {
-          styleTag = document.createElement('style');
-          styleTag.id = 'store-dynamic-colors';
-          document.head.appendChild(styleTag);
+      const fonts = (appearanceData as any).fontes || fallbackAppearance.fontes;
+
+      const fontStyles = `
+        .store-theme {
+          --store-font-primary: "${fonts.heading || 'Outfit'}";
+          --store-font-heading: "${fonts.heading || 'Outfit'}";
+          --store-font-body: "${fonts.body || 'Outfit'}";
+        }
+      `;
+
+      let fontStyleTag = document.getElementById('store-dynamic-fonts');
+
+      if (!fontStyleTag) {
+        fontStyleTag = document.createElement('style');
+        fontStyleTag.id = 'store-dynamic-fonts';
+        document.head.appendChild(fontStyleTag);
+      }
+
+      fontStyleTag.innerHTML = fontStyles;
+
+      const fontsToLoad = [];
+
+      if (fonts.heading) fontsToLoad.push(fonts.heading);
+      if (fonts.body) fontsToLoad.push(fonts.body);
+      if (layout.header_font) fontsToLoad.push(layout.header_font);
+
+      if (fontsToLoad.length > 0) {
+        const linkId = 'dynamic-google-fonts';
+        let link = document.getElementById(linkId) as HTMLLinkElement;
+
+        if (!link) {
+          link = document.createElement('link');
+          link.id = linkId;
+          link.rel = 'stylesheet';
+          document.head.appendChild(link);
         }
 
-        styleTag.innerHTML = dynamicStyles;
+        const uniqueFonts = [...new Set(fontsToLoad)];
 
-        if ((dbAppearance as any).layout) {
-          const layout = (dbAppearance as any).layout;
+        const fontFamilies = uniqueFonts
+          .map((f: any) => `${String(f).replace(/\s+/g, '+')}:wght@100;200;300;400;500;600;700;800;900`)
+          .join('&family=');
 
-          if (layout.card_radius !== undefined) {
-            document.documentElement.style.setProperty(
-              '--store-radius-card',
-              `${layout.card_radius}px`
-            );
-          }
+        link.href = `https://fonts.googleapis.com/css2?family=${fontFamilies}&display=swap`;
+      }
 
-          if (layout.button_radius !== undefined) {
-            document.documentElement.style.setProperty(
-              '--store-radius-button',
-              `${layout.button_radius}px`
-            );
-          }
+      if ((appearanceData as any).favicon_url) {
+        let favicon = document.querySelector('link[rel="icon"]');
 
-          if (layout.header_font) {
-            document.documentElement.style.setProperty(
-              '--store-header-font',
-              layout.header_font
-            );
-          }
-
-          if (layout.header_weight) {
-            document.documentElement.style.setProperty(
-              '--store-header-weight',
-              layout.header_weight
-            );
-
-            document.documentElement.style.setProperty(
-              '--store-font-weight-menu',
-              layout.header_weight
-            );
-          }
-
-          if (layout.header_spacing) {
-            document.documentElement.style.setProperty(
-              '--store-header-spacing',
-              `${layout.header_spacing}em`
-            );
-          }
-
-          if (layout.header_transform) {
-            document.documentElement.style.setProperty(
-              '--store-header-transform',
-              layout.header_transform
-            );
-          }
-
-          if (layout.header_size) {
-            document.documentElement.style.setProperty(
-              '--store-header-size',
-              `${layout.header_size}px`
-            );
-          }
-
-          if (layout.header_font) {
-            const linkId = 'dynamic-google-fonts-header';
-            let link = document.getElementById(linkId) as HTMLLinkElement;
-
-            if (!link) {
-              link = document.createElement('link');
-              link.id = linkId;
-              link.rel = 'stylesheet';
-              document.head.appendChild(link);
-            }
-
-            link.href = `https://fonts.googleapis.com/css2?family=${layout.header_font.replace(
-              /\s+/g,
-              '+'
-            )}:wght@100;200;300;400;500;600;700;800;900&display=swap`;
-          }
+        if (!favicon) {
+          favicon = document.createElement('link');
+          favicon.setAttribute('rel', 'icon');
+          document.head.appendChild(favicon);
         }
 
-        if ((dbAppearance as any).fontes) {
-          const fonts = (dbAppearance as any).fontes;
-
-          if (fonts.heading) {
-            document.documentElement.style.setProperty(
-              '--store-font-primary',
-              fonts.heading
-            );
-
-            document.documentElement.style.setProperty(
-              '--store-font-heading',
-              fonts.heading
-            );
-          }
-
-          if (fonts.body) {
-            document.documentElement.style.setProperty(
-              '--store-font-body',
-              fonts.body
-            );
-          }
-
-          const fontsToLoad = [];
-
-          if (fonts.heading) fontsToLoad.push(fonts.heading);
-          if (fonts.body) fontsToLoad.push(fonts.body);
-
-          if (fontsToLoad.length > 0) {
-            const linkId = 'dynamic-google-fonts';
-            let link = document.getElementById(linkId) as HTMLLinkElement;
-
-            if (!link) {
-              link = document.createElement('link');
-              link.id = linkId;
-              link.rel = 'stylesheet';
-              document.head.appendChild(link);
-            }
-
-            const uniqueFonts = [...new Set(fontsToLoad)];
-
-            const fontFamilies = uniqueFonts
-              .map((f: any) =>
-                `${String(f).replace(
-                  /\s+/g,
-                  '+'
-                )}:wght@100;200;300;400;500;600;700;800;900`
-              )
-              .join('&family=');
-
-            link.href = `https://fonts.googleapis.com/css2?family=${fontFamilies}&display=swap`;
-          }
-        }
-
-        if ((dbAppearance as any).favicon_url) {
-          let favicon = document.querySelector('link[rel="icon"]');
-
-          if (!favicon) {
-            favicon = document.createElement('link');
-            favicon.setAttribute('rel', 'icon');
-            document.head.appendChild(favicon);
-          }
-
-          favicon.setAttribute('href', (dbAppearance as any).favicon_url);
-        }
+        favicon.setAttribute('href', (appearanceData as any).favicon_url);
       }
 
       if (!cfgError && Array.isArray(dbConfig)) {
@@ -421,29 +330,20 @@ export const useStore = create((set: any, get: any) => ({
   setCartDrawerOpen: (open: boolean) => set({ cartDrawerOpen: open }),
 
   addToCart: (product: any, color: any, size: any) => {
-    const productId =
-      typeof product.id === 'object'
-        ? product.id.id || JSON.stringify(product.id)
-        : product.id;
+    const productId = typeof product.id === 'object'
+      ? product.id.id || JSON.stringify(product.id)
+      : product.id;
 
     const existing = get().cart.find(
-      (item: any) =>
-        item.id === productId &&
-        item.color === color &&
-        item.size === size
+      (item: any) => item.id === productId && item.color === color && item.size === size
     );
 
     let newCart;
 
     if (existing) {
       newCart = get().cart.map((item: any) =>
-        item.id === productId &&
-        item.color === color &&
-        item.size === size
-          ? {
-              ...item,
-              quantity: item.quantity + 1
-            }
+        item.id === productId && item.color === color && item.size === size
+          ? { ...item, quantity: item.quantity + 1 }
           : item
       );
     } else {
@@ -465,12 +365,7 @@ export const useStore = create((set: any, get: any) => ({
 
   removeFromCart: (id: any, color: any, size: any) => {
     const newCart = get().cart.filter(
-      (item: any) =>
-        !(
-          item.id === id &&
-          item.color === color &&
-          item.size === size
-        )
+      (item: any) => !(item.id === id && item.color === color && item.size === size)
     );
 
     set({ cart: newCart });
@@ -479,13 +374,8 @@ export const useStore = create((set: any, get: any) => ({
 
   updateCartQuantity: (id: any, color: any, size: any, quantity: any) => {
     const newCart = get().cart.map((item: any) =>
-      item.id === id &&
-      item.color === color &&
-      item.size === size
-        ? {
-            ...item,
-            quantity
-          }
+      item.id === id && item.color === color && item.size === size
+        ? { ...item, quantity }
         : item
     );
 
